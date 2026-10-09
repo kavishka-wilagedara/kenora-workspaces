@@ -50,4 +50,3 @@ Sample data contains 9 workshops across the 3 centres, all dated relative to tod
 ## API summary
 
 All endpoints are under `/api`, take and return JSON, and need `Authorization: Bearer <token>` except login. Errors always look like `{ "error": { "code", "message", "details?" } }`. A missing or invalid token returns 401; the wrong role returns 403.
-# kenora-workspaces
