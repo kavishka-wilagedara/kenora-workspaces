@@ -20,32 +20,32 @@ const historySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
-/** Full registration history, including cancellations, with who did what and when. */
+// Full registration history, cancellations, with who did what and when.
 router.get('/history', async (req, res) => {
-  const q = historySchema.parse(cleanQuery(req.query));
+  const user = historySchema.parse(cleanQuery(req.query));
   const filter = {};
-  if (q.email) filter.attendeeEmail = new RegExp(escapeRegex(q.email.toLowerCase()), 'i');
-  if (q.workshop) filter.workshop = q.workshop;
-  if (q.status) filter.status = q.status;
-  if (q.from || q.to) {
-    // Anything that happened in the window: registered in it, or cancelled in it.
+  if (user.email) filter.attendeeEmail = new RegExp(escapeRegex(user.email.toLowerCase()), 'i');
+  if (user.workshop) filter.workshop = user.workshop;
+  if (user.status) filter.status = user.status;
+  if (user.from || user.to) {
+    // In same window can be register or cancell
     const range = {};
-    if (q.from) range.$gte = q.from;
-    if (q.to) range.$lte = q.to;
+    if (user.from) range.$gte = user.from;
+    if (user.to) range.$lte = user.to;
     filter.$or = [{ registeredAt: range }, { cancelledAt: range }];
   }
 
   const [items, total] = await Promise.all([
     Registration.find(filter)
       .sort({ registeredAt: -1, _id: -1 })
-      .skip((q.page - 1) * q.limit)
-      .limit(q.limit)
+      .skip((user.page - 1) * user.limit)
+      .limit(user.limit)
       .populate('workshop', 'code title startsAt location')
       .populate('registeredBy cancelledBy', 'name email')
       .lean(),
     Registration.countDocuments(filter),
   ]);
-  res.json({ items, total, page: q.page, limit: q.limit });
+  res.json({ items, total, page: user.page, limit: user.limit });
 });
 
 const cancelSchema = z.object({ reason: z.string().trim().max(500).optional() }).default({});

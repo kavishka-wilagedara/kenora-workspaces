@@ -57,7 +57,7 @@ router.patch('/:id', async (req, res) => {
   const id = parseId(req.params.id);
   const body = updateSchema.parse(req.body);
 
-  // Prevent lock-out: an admin cannot remove their own admin access.
+  // User cant deactivate and delete own role 
   if (req.user._id.equals(id)) {
     if (body.role && body.role !== ROLES.ADMIN) throw badRequest('You cannot change your own role.');
     if (body.active === false) throw badRequest('You cannot deactivate your own account.');
@@ -67,7 +67,7 @@ router.patch('/:id', async (req, res) => {
   if (!before) throw notFound('User not found.');
 
   const update = {};
-  for (const k of ['name', 'role', 'active']) if (body[k] !== undefined) update[k] = body[k];
+  for (const user of ['name', 'role', 'active']) if (body[user] !== undefined) update[user] = body[user];
   if (body.password) update.passwordHash = await bcrypt.hash(body.password, config.bcryptRounds);
 
   const user = await User.findByIdAndUpdate(id, { $set: update }, { new: true, runValidators: true });

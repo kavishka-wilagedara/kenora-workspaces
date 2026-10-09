@@ -3,19 +3,52 @@ import { REGISTRATION_STATUSES } from '../constants.js';
 
 const { ObjectId } = mongoose.Schema.Types;
 
-// Registrations are never deleted: cancelling flips the status and records who/when.
+// Registrations are never deleted : cancelling flips the status and records who/when.
 const registrationSchema = new mongoose.Schema(
   {
-    workshop: { type: ObjectId, ref: 'Workshop', required: true },
-    attendeeName: { type: String, required: true, trim: true, maxlength: 100 },
-    attendeeEmail: { type: String, required: true, trim: true, lowercase: true },
-    status: { type: String, enum: REGISTRATION_STATUSES, default: 'ACTIVE' },
-    registeredBy: { type: ObjectId, ref: 'User', required: true },
-    registeredAt: { type: Date, default: Date.now },
-    promotedAt: { type: Date }, // set when moved from the waitlist into a seat
-    cancelledBy: { type: ObjectId, ref: 'User' },
+    workshop: { 
+      type: ObjectId, 
+      ref: 'Workshop', 
+      required: true 
+    },
+    attendeeName: { 
+      type: String, 
+      required: true, 
+      trim: true, 
+      maxlength: 100 
+    },
+    attendeeEmail: { 
+      type: String, 
+      required: true, 
+      trim: true, 
+      lowercase: true 
+    },
+    status: { 
+      type: String, 
+      enum: REGISTRATION_STATUSES, 
+      default: 'ACTIVE' 
+    },
+    registeredBy: { 
+      type: ObjectId, 
+      ref: 'User', 
+      required: true 
+    },
+    registeredAt: { 
+      type: Date, 
+      default: Date.now 
+    },
+    promotedAt: { 
+      type: Date 
+    }, // set when moved from the waitlist into a seat
+    cancelledBy: { 
+      type: ObjectId, 
+      ref: 'User' 
+    },
     cancelledAt: { type: Date },
-    cancelReason: { type: String, trim: true, maxlength: 500 },
+    cancelReason: { 
+      type: String, 
+      trim: true, 
+      maxlength: 500 },
   },
   { timestamps: true },
 );

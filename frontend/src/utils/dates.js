@@ -22,7 +22,7 @@ export function addDays(d, n) {
   return x;
 }
 
-/** Monday-to-Sunday week containing `d`. */
+// Monday-to-Sunday week containing
 export function weekRange(d = new Date()) {
   const offset = (d.getDay() + 6) % 7; // Monday = 0
   const monday = startOfDay(addDays(d, -offset));
@@ -36,15 +36,16 @@ export const RANGE_PRESETS = {
   all: { label: 'All dates', range: () => [null, null] },
 };
 
-/** yyyy-mm-dd for <input type="date"> */
-export const toDateInput = (d) => (d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : '');
-/** yyyy-mm-ddThh:mm for <input type="datetime-local"> (local time) */
+// yyyy-mm-dd for date input
+export const toDateInput = (d) => 
+  (d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : '');
+
 export const toDateTimeInput = (d) => {
   if (!d) return '';
   const x = new Date(d);
   return `${toDateInput(x)}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
 };
-/** Parse a yyyy-mm-dd input as a local date. */
+// Parse a yyyy-mm-dd input as a local date
 export const fromDateInput = (s) => {
   if (!s) return null;
   const [y, m, d] = s.split('-').map(Number);

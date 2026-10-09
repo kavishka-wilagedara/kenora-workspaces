@@ -89,7 +89,7 @@ export function Field({ label, error, hint, children }) {
   );
 }
 
-/** Accessible modal built on <dialog>. */
+// Accessible modal
 export function Modal({ open, title, onClose, children }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -106,7 +106,7 @@ export function Modal({ open, title, onClose, children }) {
   );
 }
 
-/** Confirm with an optional free-text reason. `onConfirm(reason)` may return a promise. */
+// Confirm with an optional free-text reason
 export function ConfirmDialog({ open, title, message, confirmLabel = 'Confirm', danger, askReason, onConfirm, onClose }) {
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);

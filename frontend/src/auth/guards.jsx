@@ -11,7 +11,6 @@ export function RequireAuth({ children }) {
   return children;
 }
 
-/** UI-side guard only, for a clean experience. The API enforces the same rules. */
 export function RequireRole({ roles }) {
   const { user } = useAuth();
   if (!roles.includes(user.role)) return <Navigate to={homeFor(user.role)} replace />;

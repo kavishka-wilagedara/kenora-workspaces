@@ -17,7 +17,7 @@ export default function RegisterForm({ workshop, onDone, onSeatChange }) {
   const [touched, setTouched] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
-  const [fullNow, setFullNow] = useState(false); // server said full while we were typing
+  const [fullNow, setFullNow] = useState(false);
 
   const ended = new Date(workshop.endsAt) <= new Date();
   if (workshop.status !== 'SCHEDULED' || ended) {
@@ -52,7 +52,9 @@ export default function RegisterForm({ workshop, onDone, onSeatChange }) {
         kind: 'success',
         text: res.waitlisted
           ? `${name} is on the waitlist. They will get a seat automatically if one frees up.`
-          : `${name} is registered. ${left === 0 ? 'The workshop is now full.' : `${left} seat${left === 1 ? '' : 's'} left.`}`,
+          : `${name} is registered. ${left === 0 
+            ? 'The workshop is now full.' 
+            : `${left} seat${left === 1 ? '' : 's'} left.`}`,
       });
     } catch (err) {
       if (err.code === 'WORKSHOP_FULL') {

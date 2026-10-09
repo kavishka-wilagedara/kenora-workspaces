@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
     setUnauthorizedHandler((err) => logout(err.message));
   }, [logout]);
 
-  // Restore the session on page load; the server decides if the token is still good.
+  // Restore the session on page load
   useEffect(() => {
     if (!tokenStore.get()) return;
     api

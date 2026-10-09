@@ -11,8 +11,6 @@ export async function connectDb(uri) {
     console.log('Using in-memory MongoDB (data is lost on restart)');
   }
   await mongoose.connect(uri);
-  // Make sure the unique / partial indexes exist before we accept traffic:
-  // the duplicate-registration rule depends on them.
   await Promise.all([User, Workshop, Registration, AuditLog].map((m) => m.syncIndexes()));
   return uri;
 }

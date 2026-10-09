@@ -1,15 +1,7 @@
 import { Registration, Workshop } from '../models/index.js';
 import { conflict, notFound } from '../utils/errors.js';
 
-/**
- * THE CAPACITY RULE
- *
- * A seat is taken by a single atomic conditional update on the workshop document:
- * "increment activeCount only if activeCount < capacity". MongoDB applies single-document
- * updates atomically, so when N requests race for the last seat exactly one matches the
- * filter and the rest get null. No read-then-write gap exists to exploit, and it does not
- * need transactions or a replica set.
- */
+// Seat is taken by a single atomic conditional
 async function reserveSeat(workshopId, now = new Date()) {
   return Workshop.findOneAndUpdate(
     {
@@ -23,12 +15,12 @@ async function reserveSeat(workshopId, now = new Date()) {
   );
 }
 
-/** Give a seat back. Guarded so the counter can never go negative. */
+// Give a seat back. Guarded so the counter can never go negative
 async function releaseSeat(workshopId) {
   await Workshop.updateOne({ _id: workshopId, activeCount: { $gt: 0 } }, { $inc: { activeCount: -1 } });
 }
 
-/** Work out *why* a reservation failed so staff get a useful message. */
+// Reservation failed message
 async function explainReserveFailure(workshopId, now) {
   const ws = await Workshop.findById(workshopId).lean();
   if (!ws) throw notFound('Workshop not found.');
@@ -52,7 +44,7 @@ export async function registerAttendee({ workshopId, attendeeName, attendeeEmail
   const email = attendeeEmail.trim().toLowerCase();
   const now = new Date();
 
-  // Friendly early check. Not relied on for correctness: the partial unique indexes are.
+  // Early checking
   const existing = await Registration.findOne({
     workshop: workshopId,
     attendeeEmail: email,
@@ -80,7 +72,7 @@ export async function registerAttendee({ workshopId, attendeeName, attendeeEmail
     });
     return { registration, waitlisted: false };
   } catch (err) {
-    // Compensate: we hold a seat but failed to record who it is for, so give it back.
+    // Seat reverse
     await releaseSeat(workshopId);
     if (err?.code === 11000) throw alreadyRegistered(email, 'ACTIVE');
     throw err;
@@ -101,17 +93,13 @@ async function addToWaitlist({ workshopId, attendeeName, email, actorId }) {
     if (err?.code === 11000) throw alreadyRegistered(email, 'WAITLISTED');
     throw err;
   }
-  // A seat may have been freed between our failed reservation and the insert above.
+  
   const promoted = await promoteFromWaitlist(workshopId);
   const self = promoted.find((r) => r._id.equals(registration._id));
   return { registration: self ?? registration, waitlisted: !self };
 }
 
-/**
- * Move people from the waitlist into free seats, oldest first. Uses the same atomic
- * reserveSeat() so promotion can never exceed capacity, and a status-guarded update on
- * the waitlist entry so two concurrent promoters cannot promote the same person twice.
- */
+// Move people from the waitlist into free seats, oldest first
 export async function promoteFromWaitlist(workshopId) {
   const promoted = [];
   for (;;) {
@@ -152,15 +140,12 @@ export async function promoteFromWaitlist(workshopId) {
   return promoted;
 }
 
-/**
- * Cancel is atomic and idempotent: the status guard means only one of several concurrent
- * cancels matches, so a seat is freed at most once.
- */
+// Cancel is atomic event seat is freed at most once.
 export async function cancelRegistration({ registrationId, actorId, reason }) {
   const before = await Registration.findOneAndUpdate(
     { _id: registrationId, status: { $in: ['ACTIVE', 'WAITLISTED'] } },
     { $set: { status: 'CANCELLED', cancelledBy: actorId, cancelledAt: new Date(), cancelReason: reason || undefined } },
-    { new: false }, // pre-image: we need to know whether it held a seat
+    { new: false },
   );
 
   if (!before) {
@@ -179,12 +164,6 @@ export async function cancelRegistration({ registrationId, actorId, reason }) {
   return { registration, promoted };
 }
 
-/**
- * Safety net: recompute activeCount from the registrations themselves. Covers the one
- * window the design cannot (process crash between reserving a seat and inserting the
- * registration, which leaves the count one too HIGH, i.e. it fails safe by under-booking).
- * Run at startup / via `npm run recount`, when no registrations are in flight.
- */
 export async function recountActiveRegistrations() {
   const counts = await Registration.aggregate([
     { $match: { status: 'ACTIVE' } },

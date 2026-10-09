@@ -82,7 +82,7 @@ export default function WorkshopFormPage() {
     try {
       let saved;
       if (isEdit) {
-        // Send only what changed, so we never overwrite someone else's edit to another field.
+        // Sending only what changed
         const changed = Object.fromEntries(
           Object.entries(body).filter(([k, v]) =>
             k === 'startsAt' || k === 'endsAt' ? new Date(original[k]).getTime() !== new Date(v).getTime() : original[k] !== v,

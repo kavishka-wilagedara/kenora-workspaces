@@ -14,7 +14,17 @@ router.use(authenticate);
 const canView = authorize(ROLES.MANAGER, ROLES.STAFF);
 const canManage = authorize(ROLES.MANAGER);
 
-const EDITABLE = ['code', 'title', 'instructor', 'location', 'startsAt', 'endsAt', 'capacity', 'status', 'description'];
+const EDITABLE = [
+  'code', 
+  'title', 
+  'instructor', 
+  'location', 
+  'startsAt', 
+  'endsAt', 
+  'capacity', 
+  'status', 
+  'description'
+];
 
 export function withSeats(w) {
   const obj = typeof w.toObject === 'function' ? w.toObject() : w;
@@ -130,8 +140,7 @@ router.patch('/:id', canManage, async (req, res) => {
     throw conflict('DUPLICATE', `Workshop code ${body.code} is already in use.`);
   }
 
-  // Capacity may never drop below the seats already taken. The guard is part of the
-  // same atomic update, so it cannot race with a registration taking a seat.
+  // Capacity nevr drop
   const filter = { _id: id };
   if (body.capacity !== undefined) filter.activeCount = { $lte: body.capacity };
 
@@ -162,14 +171,13 @@ router.patch('/:id', canManage, async (req, res) => {
     });
   }
 
-  // More seats may mean people on the waitlist can now get in.
+  // Waitlist user can booking
   if (changes.capacity || changes.status) await promoteFromWaitlist(id);
   const fresh = await Workshop.findById(id).lean();
   res.json({ workshop: withSeats(fresh) });
 });
 
-// ---- Registrations for a workshop ----
-
+// Registrations for a workshop
 const registerSchema = z.object({
   attendeeName: z.string().trim().min(1, 'Attendee name is required').max(100),
   attendeeEmail: z.string().trim().toLowerCase().email('Enter a valid email address'),

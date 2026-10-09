@@ -5,7 +5,7 @@ import { connectDb, disconnectDb } from './db.js';
 import { AuditLog, Registration, User, Workshop } from './models/index.js';
 import { recountActiveRegistrations } from './services/registrationService.js';
 
-// Dev-only credentials (also listed in the README).
+// User credentials
 export const SEED_USERS = [
   { name: 'Ada Admin', email: 'admin@example.com', password: 'Admin123!', role: 'ADMIN' },
   { name: 'Morgan Manager', email: 'manager@example.com', password: 'Manager123!', role: 'MANAGER' },
@@ -42,8 +42,6 @@ export async function seedDatabase({ log = false } = {}) {
   const manager = users.MANAGER._id;
   const staff = users.STAFF._id;
 
-  // Times are relative to "now" so the data always looks current. Booked counts are the
-  // number of ACTIVE registrations to create.
   const plan = [
     { code: 'POT-101', title: 'Intro to Wheel Throwing', instructor: 'Hana Ito', location: 'Northside Centre', startsAt: at(1, 10), len: 2, capacity: 8, booked: 7, note: 'nearly full' },
     { code: 'COD-201', title: 'Python for Beginners', instructor: 'Dev Raman', location: 'Downtown Centre', startsAt: at(2, 18), len: 2, capacity: 20, booked: 5, cancelled: 1 },

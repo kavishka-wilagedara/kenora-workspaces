@@ -7,8 +7,13 @@ import { cleanQuery } from '../utils/validation.js';
 
 const router = Router();
 
-// Admins see account changes; managers see workshop changes. Each sees the area they own.
-const SCOPE = { [ROLES.ADMIN]: 'USER', [ROLES.MANAGER]: 'WORKSHOP' };
+// Admins see account changes
+// Managers see workshop changes. 
+// Staff see the area they own.
+const SCOPE = { 
+  [ROLES.ADMIN]: 'USER', 
+  [ROLES.MANAGER]: 'WORKSHOP' 
+};
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

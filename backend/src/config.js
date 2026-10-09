@@ -8,8 +8,8 @@ if (isProd && !process.env.JWT_SECRET) {
 
 export const config = {
   port: Number(process.env.PORT) || 4000,
-  mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/workshops',
-  jwtSecret: process.env.JWT_SECRET || 'dev-only-insecure-secret',
+  mongoUri: process.env.MONGO_URI,
+  jwtSecret: process.env.JWT_SECRET || 'secret-key',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   bcryptRounds: Number(process.env.BCRYPT_ROUNDS) || 10,
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',

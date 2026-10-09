@@ -1,7 +1,6 @@
 const BASE = import.meta.env.VITE_API_URL || '';
 const TOKEN_KEY = 'wrs.token';
 
-// localStorage is simple and survives refreshes; the trade-off (XSS can read it) is noted in DESIGN.md.
 export const tokenStore = {
   get() {
     try {
@@ -14,14 +13,12 @@ export const tokenStore = {
     try {
       localStorage.setItem(TOKEN_KEY, token);
     } catch {
-      /* private mode: session will just not persist */
     }
   },
   clear() {
     try {
       localStorage.removeItem(TOKEN_KEY);
     } catch {
-      /* ignore */
     }
   },
 };
@@ -34,7 +31,7 @@ export class ApiError extends Error {
     this.details = details;
   }
 
-  /** Field-level messages from a validation error, keyed by field name. */
+  // Validation error
   fieldErrors() {
     const out = {};
     for (const d of Array.isArray(this.details) ? this.details : []) {

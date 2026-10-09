@@ -4,15 +4,17 @@ import { User } from '../models/index.js';
 import { forbidden, unauthorized } from '../utils/errors.js';
 
 export function signToken(user) {
-  return jwt.sign({ sub: String(user._id), role: user.role }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+  return jwt.sign({ 
+      sub: String(user._id), 
+      role: user.role 
+    }, 
+    config.jwtSecret, {
+      expiresIn: config.jwtExpiresIn,
+    }
+  );
 }
 
-/**
- * Verifies the Bearer token and loads the user fresh from the DB on every request,
- * so role changes and deactivations take effect immediately (not when the token expires).
- */
+// Verifies the Bearer token and loads the user 
 export async function authenticate(req, _res, next) {
   const header = req.get('authorization') || '';
   const [scheme, token] = header.split(' ');
@@ -32,7 +34,7 @@ export async function authenticate(req, _res, next) {
   next();
 }
 
-/** Allow only the listed roles. Must run after authenticate. */
+// Allow only the listed roles
 export function authorize(...roles) {
   return (req, _res, next) => {
     if (!req.user) throw unauthorized();

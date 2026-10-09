@@ -8,7 +8,7 @@ import { endOfDay, fmtDay, fmtTime, fromDateInput, RANGE_PRESETS, toDateInput } 
 import { can } from '../utils/roles.js';
 import { useApi } from '../utils/useApi.js';
 
-// Default view answers the front desk's most common question: "what still has seats this week?"
+// Default view answers
 const DEFAULTS = { range: 'week', status: 'SCHEDULED', seats: '1', q: '', location: '', from: '', to: '' };
 
 export default function WorkshopsPage() {
@@ -17,8 +17,7 @@ export default function WorkshopsPage() {
   const [params, setParams] = useSearchParams();
   const f = Object.fromEntries(Object.keys(DEFAULTS).map((k) => [k, params.get(k) ?? DEFAULTS[k]]));
 
-  // Filters live in the URL so refresh/back keep them. Built from the latest params so a
-  // debounced search can't overwrite a filter changed in the meantime.
+  // Filters live in the URL
   const set = (patch) =>
     setParams(
       (prev) => {
@@ -37,7 +36,6 @@ export default function WorkshopsPage() {
   useEffect(() => {
     const t = setTimeout(() => search !== f.q && set({ q: search }), 300);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const query = useMemo(() => {

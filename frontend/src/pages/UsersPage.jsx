@@ -68,7 +68,6 @@ export default function UsersPage() {
                       disabled={self}
                       title={self ? 'You cannot change your own role' : ROLE_HELP[u.role]}
                       onChange={(e) => {
-                        // Capture now: the controlled select snaps back to u.role until confirmed.
                         const role = e.target.value;
                         setConfirm({
                           title: 'Change role?',

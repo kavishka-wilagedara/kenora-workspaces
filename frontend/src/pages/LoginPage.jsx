@@ -32,7 +32,7 @@ export default function LoginPage() {
   return (
     <div className="login-wrap">
       <form className="card login-card" onSubmit={submit}>
-        <h1>🎟️ Workshop registrations</h1>
+        <h1>Workshop registrations</h1>
         <p className="muted">Sign in with your staff account.</p>
         {notice && !error && <Alert kind="info">{notice}</Alert>}
         <ErrorMessage error={error} />
